@@ -1,0 +1,64 @@
+{
+	"icon": "icon.png",
+	"name": "prettier-rust",
+	"publisher": "jinxdash",
+	"displayName": "Prettier - Code formatter (Rust)",
+	"description": "Prettier Rust is a code formatter that autocorrects bad syntax",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jinxdash/prettier-plugin-rust.git",
+		"directory": "extension"
+	},
+	"author": "jinxdash <jinxdash.github@gmail.com> (https://github.com/jinxdash)",
+	"version": "0.1.9",
+	"engines": {
+		"vscode": "^1.69.0"
+	},
+	"categories": [
+		"Formatters"
+	],
+	"keywords": [
+		"rust",
+		"formatter",
+		"prettier"
+	],
+	"scripts": {
+		"bundle": "esbuild src/index.ts --bundle --outfile=index.js --format=cjs --platform=node --external:vscode",
+		"watch": "pnpm run bundle --watch",
+		"package": "pnpm run bundle && pnpm vsce package --no-dependencies",
+		"publish": "pnpm vsce publish --no-dependencies"
+	},
+	"contributes": {
+		"languages": [
+			{
+				"id": "rust",
+				"aliases": [
+					"rs"
+				],
+				"extensions": [
+					"rs"
+				]
+			}
+		]
+	},
+	"devDependencies": {
+		"@types/node": "^18.0.6",
+		"@types/vscode": "^1.69.0",
+		"esbuild": "^0.14.49",
+		"typescript": "^4.7.4"
+	},
+	"dependencies": {
+		"prettier": "^2.7.1",
+		"jinx-rust": "0.1.6",
+		"prettier-plugin-rust": "workspace:prettier-plugin-rust"
+	},
+	"main": "index.js",
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"__metadata": {
+		"installedTimestamp": 1785562105038,
+		"targetPlatform": "undefined",
+		"size": 12463967
+	}
+}

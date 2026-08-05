@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notepad Lyric Video Template</title>
+<style>
+  :root {
+    --notepad-gray: #c0c0c0;
+    --notepad-blue: #000080;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #2b2b2b;
+    font-family: Tahoma, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ===== Jendela Notepad ===== */
+  #notepad-window {
+    width: 640px;
+    max-width: 92vw;
+    height: 420px;
+    background: #fff;
+    border: 1px solid #808080;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .title-bar {
+    background: var(--notepad-blue);
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 3px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .title-bar .icon-text {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .win-buttons { display: flex; gap: 2px; }
+  .win-buttons span {
+    width: 18px;
+    height: 16px;
+    background: var(--notepad-gray);
+    color: #000;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #808080;
+  }
+
+  .menu-bar {
+    background: var(--notepad-gray);
+    font-size: 12px;
+    padding: 2px 6px;
+    display: flex;
+    gap: 14px;
+    border-bottom: 1px solid #808080;
+  }
+  .menu-bar span { text-decoration: none; }
+  .menu-bar span u { text-decoration: underline; }
+
+  .editor-area {
+    flex: 1;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  #lyric-text {
+    position: absolute;
+    top: 40px;
+    left: 60px;
+    right: 40px;
+    font-family: "MS Sans Serif", Tahoma, sans-serif;
+    font-size: 30px;
+    line-height: 1.35;
+    color: #111;
+    white-space: pre-line;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  #lyric-text.show {
+    opacity: 1;
+  }
+
+  .scrollbar-v {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 100%;
+    background: var(--notepad-gray);
+    border-left: 1px solid #808080;
+  }
+  .scrollbar-h {
+    height: 16px;
+    background: var(--notepad-gray);
+    border-top: 1px solid #808080;
+  }
+
+  /* Kontrol pemutaran (tidak wajib, hanya bantu preview) */
+  #controls {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  #controls button {
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+  #controls span {
+    color: #ccc;
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div>
+  <div id="notepad-window">
+    <div class="title-bar">
+      <div class="icon-text">📄 - - Notepad</div>
+      <div class="win-buttons">
+        <span>_</span><span>□</span><span>×</span>
+      </div>
+    </div>
+    <div class="menu-bar">
+      <span><u>F</u>ile</span>
+      <span><u>E</u>dit</span>
+      <span><u>S</u>earch</span>
+      <span><u>H</u>elp</span>
+    </div>
+    <div class="editor-area">
+      <div id="lyric-text"></div>
+      <div class="scrollbar-v"></div>
+    </div>
+    <div class="scrollbar-h"></div>
+  </div>
+
+  <div id="controls">
+    <button id="playBtn">▶ Mulai</button>
+    <span id="statusText">Baris 0 / 0</span>
+  </div>
+</div>
+
+<script>
+  /* =========================================================
+     ISI LIRIK DI SINI
+     - Setiap elemen array = satu tampilan/baris di layar
+     - Gunakan \n untuk baris baru dalam satu tampilan
+     - "duration" = lama teks itu tampil (ms) sebelum ganti
+     ========================================================= */
+  const lyricLines = [
+    { text: "Sepertinya sama\nTatapan khas matanya masih alamak", duration: 6500 },
+    { text: "Kauajak bicara\nSeketika kembali ku jatuh cinta", duration: 7500 },
+    { text: "Sialan dia", duration: 7100 },
+    { text: "Sakit dan air mata sia (sia)", duration: 3000 },
+  ];
+
+  const lyricEl = document.getElementById('lyric-text');
+  const playBtn = document.getElementById('playBtn');
+  const statusText = document.getElementById('statusText');
+
+  let currentIndex = 0;
+  let playing = false;
+  let timer = null;
+
+  function showLine(index) {
+    if (index >= lyricLines.length) {
+      playing = false;
+      playBtn.textContent = '▶ Mulai';
+      statusText.textContent = `Selesai (${lyricLines.length} baris)`;
+      return;
+    }
+
+    lyricEl.classList.remove('show');
+
+    setTimeout(() => {
+      lyricEl.textContent = lyricLines[index].text;
+      lyricEl.classList.add('show');
+      statusText.textContent = `Baris ${index + 1} / ${lyricLines.length}`;
+    }, 150);
+
+    timer = setTimeout(() => {
+      currentIndex++;
+      showLine(currentIndex);
+    }, lyricLines[index].duration);
+  }
+
+  function startPlayback() {
+    playing = true;
+    playBtn.textContent = '⏸ Berhenti';
+    currentIndex = 0;
+    showLine(currentIndex);
+  }
+
+  function stopPlayback() {
+    playing = false;
+    playBtn.textContent = '▶ Mulai';
+    clearTimeout(timer);
+    lyricEl.classList.remove('show');
+    statusText.textContent = `Baris 0 / ${lyricLines.length}`;
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (playing) {
+      stopPlayback();
+    } else {
+      startPlayback();
+    }
+  });
+
+  statusText.textContent = `Baris 0 / ${lyricLines.length}`;
+</script>
+</body>
+</html>

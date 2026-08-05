@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confess</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fdf2f4;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 1rem;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  .heart {
+    font-size: 40px;
+    color: #d4537e;
+  }
+  #main-text {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 1rem 0 0.25rem;
+    color: #2c2c2a;
+  }
+  #sub-text {
+    font-size: 13px;
+    color: #888780;
+    margin: 0 0 1.5rem;
+  }
+  #arena {
+    position: relative;
+    width: 100%;
+    height: 160px;
+  }
+  button {
+    position: absolute;
+    top: 60px;
+    padding: 12px 26px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+  }
+  #yes-btn {
+    left: 50%;
+    transform: translateX(calc(-100% - 8px));
+    background: #d4537e;
+    color: #ffffff;
+  }
+  #yes-btn:hover {
+    background: #b23f66;
+  }
+  #no-btn {
+    left: 50%;
+    transform: translateX(8px);
+    background: #f1efe8;
+    color: #5f5e5a;
+    border: 1px solid #d3d1c7;
+    transition: left 0.15s ease, top 0.15s ease;
+  }
+  #counter {
+    font-size: 13px;
+    color: #888780;
+    margin-top: 1rem;
+    min-height: 18px;
+  }
+  #result {
+    display: none;
+    margin-top: 1rem;
+    font-size: 40px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="heart">&#10084;</div>
+  <p id="main-text">Aku suka kamu. Mau jadi pacarku?</p>
+  <p id="sub-text">Tenang, tombol tolaknya cuma hiasan kok</p>
+
+  <div id="arena">
+    <button id="yes-btn">&#10003; Ya, mau!</button>
+    <button id="no-btn">Enggak deh</button>
+  </div>
+
+  <p id="counter"></p>
+  <div id="result">&#10084;</div>
+</div>
+
+<script>
+  const arena = document.getElementById('arena');
+  const noBtn = document.getElementById('no-btn');
+  const yesBtn = document.getElementById('yes-btn');
+  const counter = document.getElementById('counter');
+  const result = document.getElementById('result');
+  const mainText = document.getElementById('main-text');
+  const subText = document.getElementById('sub-text');
+
+  let dodges = 0;
+  const excuses = [
+    'eh jangan diklik, geli',
+    'lho, kabur duluan',
+    'nggak nggak nggak',
+    'coba lagi deh, ga bakal kena',
+    'tombol ini anti tolak-tolak',
+    'yah, meleset lagi'
+  ];
+
+  function randomPos() {
+    const w = arena.offsetWidth;
+    const h = arena.offsetHeight;
+    const btnW = noBtn.offsetWidth || 100;
+    const btnH = noBtn.offsetHeight || 40;
+    const x = Math.random() * Math.max(w - btnW, 0);
+    const y = Math.random() * Math.max(h - btnH, 0);
+    return { x, y };
+  }
+
+  function dodge() {
+    const pos = randomPos();
+    noBtn.style.left = pos.x + 'px';
+    noBtn.style.top = pos.y + 'px';
+    noBtn.style.transform = 'none';
+    dodges += 1;
+    counter.textContent = 'Tombol tolak sudah lari ' + dodges + ' kali: ' + excuses[dodges % excuses.length];
+  }
+
+  noBtn.addEventListener('mouseenter', dodge);
+  noBtn.addEventListener('touchstart', function (e) { e.preventDefault(); dodge(); }, { passive: false });
+  noBtn.addEventListener('click', function (e) { e.preventDefault(); dodge(); });
+
+  yesBtn.addEventListener('click', function () {
+    arena.style.display = 'none';
+    mainText.textContent = 'Yeay, akhirnya!';
+    subText.textContent = 'Tombol tolaknya nyerah duluan sih';
+    counter.style.display = 'none';
+    result.style.display = 'block';
+  });
+</script>
+
+</body>
+</html>
